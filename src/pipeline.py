@@ -3,11 +3,13 @@ from pathlib import Path
 from prefect import flow, task
 
 from src.audit import get_audit_logger, log_event
+from src.bias import build_bias_report
 from src.preprocessing import add_pdays_features, drop_duplicate_rows, load_data
 from src.validation import validate_data
 
 RAW_PATH = "data/raw/bank-additional-full.csv"
 OUTPUT_PATH = "data/processed/bank_marketing_clean.csv"
+BIAS_REPORT_PATH = "reports/bias_representation.csv"
 
 
 @task
@@ -50,6 +52,21 @@ def validate_step(df, logger, project_dir):
 
 
 @task
+def bias_step(df, bias_report_path, logger):
+    report = build_bias_report(df)
+    path = Path(bias_report_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    report.to_csv(path, index=False, lineterminator="\n")
+    flagged = report[report["small_group"]]
+    names = [f"{a}={g}" for a, g in zip(flagged["attribute"], flagged["group"])]
+    log_event(logger, "bias", "representation_report",
+              rows_in=len(df), rows_out=len(report),
+              file_path=path,
+              detail=f"small groups flagged: {len(flagged)} {names}")
+    return report
+
+
+@task
 def save_step(df, output_path, logger):
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -61,6 +78,7 @@ def save_step(df, output_path, logger):
 
 @flow(name="bank-marketing-pipeline")
 def run_pipeline(raw_path=RAW_PATH, output_path=OUTPUT_PATH,
+                 bias_report_path=BIAS_REPORT_PATH,
                  log_path="logs/audit.log", gx_dir="gx_project",
                  expected_rows=41188):
     logger = get_audit_logger(log_path)
@@ -68,6 +86,7 @@ def run_pipeline(raw_path=RAW_PATH, output_path=OUTPUT_PATH,
     df = pdays_step(df, logger)
     df = dedupe_step(df, logger)
     validate_step(df, logger, gx_dir)
+    bias_step(df, bias_report_path, logger)
     return save_step(df, output_path, logger)
 
 
