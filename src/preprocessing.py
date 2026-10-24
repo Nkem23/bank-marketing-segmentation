@@ -50,3 +50,21 @@ def load_data(file_path, expected_rows=EXPECTED_ROWS):
         )
 
     return df[EXPECTED_COLUMNS]
+
+
+def add_pdays_features(df):
+    """Split pdays into a contacted-before flag and a days-since-contact column.
+
+    previously_contacted comes from the previous column, not pdays, because
+    4,110 rows have pdays == 999 but a recorded earlier contact.
+    days_since_previous_contact is NaN where pdays == 999.
+    """
+    df = df.copy()
+    df["previously_contacted"] = (df["previous"] > 0).astype(int)
+    df["days_since_previous_contact"] = df["pdays"].where(df["pdays"] != 999)
+    return df
+
+
+def drop_duplicate_rows(df):
+    """Drop exact duplicate rows, keeping the first occurrence."""
+    return df.drop_duplicates().reset_index(drop=True)

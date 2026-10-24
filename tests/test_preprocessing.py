@@ -1,8 +1,7 @@
 import pytest
 import pandas as pd
 
-from src.preprocessing import EXPECTED_COLUMNS, load_data
-
+from src.preprocessing import EXPECTED_COLUMNS, add_pdays_features, drop_duplicate_rows, load_data
 
 def create_test_csv(path, columns=None):
     if columns is None:
@@ -57,3 +56,28 @@ def test_load_data_reorders_columns(tmp_path):
     df = load_data(csv_path, expected_rows=2)
 
     assert list(df.columns) == EXPECTED_COLUMNS
+
+
+
+def test_add_pdays_features():
+    df = pd.DataFrame(
+        {
+            "pdays": [999, 999, 5, 12],
+            "previous": [0, 2, 1, 3],
+        }
+    )
+
+    result = add_pdays_features(df)
+
+    assert list(result["previously_contacted"]) == [0, 1, 1, 1]
+    assert result["days_since_previous_contact"].isna().tolist() == [True, True, False, False]
+    assert "previously_contacted" not in df.columns
+
+
+def test_drop_duplicate_rows():
+    df = pd.DataFrame({"a": [1, 1, 2], "b": ["x", "x", "y"]})
+
+    result = drop_duplicate_rows(df)
+
+    assert len(result) == 2
+    assert len(df) == 3
