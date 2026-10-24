@@ -53,7 +53,7 @@ def validate_step(df, logger, project_dir):
 def save_step(df, output_path, logger):
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(output_path, index=False)
+    df.to_csv(output_path, index=False, lineterminator="\n")
     log_event(logger, "output", "write_clean_csv",
               rows_in=len(df), rows_out=len(df), file_path=output_path)
     return str(output_path)

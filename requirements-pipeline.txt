@@ -1,0 +1,6 @@
+pandas==3.0.6
+great-expectations==1.24.1
+prefect==3.9.0
+pytest==9.1.1
+Faker==40.43.0
+fairlearn==0.15.0
