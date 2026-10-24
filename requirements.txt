@@ -6,3 +6,7 @@ plotly==7.1.0
 scikit-learn==1.9.1
 shap==0.51.0
 streamlit==1.66.0
+great-expectations==1.24.1
+prefect==3.9.0
+pytest==9.1.1
+Faker==40.43.0
