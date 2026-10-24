@@ -224,3 +224,4 @@ data/processed/*
 !data/processed/.gitkeep
 
 gx_project/
+logs/
