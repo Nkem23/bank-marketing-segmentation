@@ -2,6 +2,7 @@ from pathlib import Path
 
 from prefect import flow, task
 
+from src.anonymization import drop_pii_columns, k_anonymity_report
 from src.audit import get_audit_logger, log_event
 from src.bias import build_bias_report
 from src.preprocessing import add_pdays_features, drop_duplicate_rows, load_data
@@ -35,6 +36,19 @@ def dedupe_step(df, logger):
     log_event(logger, "clean", "drop_duplicate_rows",
               rows_in=len(df), rows_out=len(result),
               detail=f"removed {len(df) - len(result)} duplicate rows")
+    return result
+
+
+@task
+def privacy_step(df, logger):
+    result, flagged = drop_pii_columns(df)
+    risk = k_anonymity_report(result)
+    log_event(logger, "privacy", "pii_scan_and_k_anonymity",
+              rows_in=len(df), rows_out=len(result),
+              detail=(f"pii_columns_found={sorted(flagged)}; k={risk['k']}; "
+                      f"smallest_group={risk['smallest_group']}; "
+                      f"rows_below_k={risk['rows_below_k']} "
+                      f"({risk['share_rows_below_k']:.2%})"))
     return result
 
 
@@ -85,6 +99,7 @@ def run_pipeline(raw_path=RAW_PATH, output_path=OUTPUT_PATH,
     df = load_step(raw_path, logger, expected_rows)
     df = pdays_step(df, logger)
     df = dedupe_step(df, logger)
+    df = privacy_step(df, logger)
     validate_step(df, logger, gx_dir)
     bias_step(df, bias_report_path, logger)
     return save_step(df, output_path, logger)
