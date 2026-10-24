@@ -5,7 +5,13 @@ from prefect import flow, task
 from src.anonymization import drop_pii_columns, k_anonymity_report
 from src.audit import get_audit_logger, log_event
 from src.bias import build_bias_report
-from src.preprocessing import add_pdays_features, drop_duplicate_rows, load_data
+
+from src.preprocessing import (
+    add_pdays_features,
+    drop_duplicate_rows,
+    load_data,
+    select_model_inputs,
+)
 from src.validation import validate_data
 
 RAW_PATH = "data/raw/bank-additional-full.csv"
@@ -86,9 +92,16 @@ def save_step(df, output_path, logger):
     output_path.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(output_path, index=False, lineterminator="\n")
     log_event(logger, "output", "write_clean_csv",
-              rows_in=len(df), rows_out=len(df), file_path=output_path)
-    return str(output_path)
+              rows_in=len(df), rows_out=len(df), file_path=output_path,
+              detail="full cleaned table, for retrospective evaluation")
 
+    model_path = output_path.with_name("bank_marketing_model_inputs.csv")
+    model_df = select_model_inputs(df)
+    model_df.to_csv(model_path, index=False, lineterminator="\n")
+    log_event(logger, "output", "write_model_inputs",
+              rows_in=len(df), rows_out=len(model_df), file_path=model_path,
+              detail="duration and campaign removed (not known at decision time)")
+    return str(output_path)
 
 @flow(name="bank-marketing-pipeline")
 def run_pipeline(raw_path=RAW_PATH, output_path=OUTPUT_PATH,

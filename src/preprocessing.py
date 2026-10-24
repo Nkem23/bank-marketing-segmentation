@@ -68,3 +68,16 @@ def add_pdays_features(df):
 def drop_duplicate_rows(df):
     """Drop exact duplicate rows, keeping the first occurrence."""
     return df.drop_duplicates().reset_index(drop=True)
+
+
+LEAKAGE_COLUMNS = ["duration", "campaign"]
+
+
+def select_model_inputs(df):
+    """Return a copy of df without columns that are unknown at decision time.
+
+    duration is only known after a call ends, and campaign is the final
+    contact count for the current campaign. Both are kept in the full
+    cleaned table for retrospective evaluation, but never given to a model.
+    """
+    return df.drop(columns=LEAKAGE_COLUMNS)
