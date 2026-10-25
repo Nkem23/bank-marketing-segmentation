@@ -54,7 +54,7 @@ Recall = share of each group's subscribers who reach the outreach list (top 30% 
 
 - Bands beyond the 10-point recall-gap rule: 5 before, 0 after. Because bands have 50-346 subscribers, recall estimates carry intervals of roughly 10 points, so "0" means no detectable gap, not proven equality.
 - Disparate impact ratio (age bands): 0.161 before, 0.371 after, against the 0.80 screening convention. It fails because subscription rates differ widely by age (about 7% to 52%) and recall parity, not equal selection, was the chosen objective (Module 2).
-- Marital status: 2 groups beyond the gap before, 0 after. Education was not mitigated: 3 groups beyond the gap before and after (basic.9y -31 points, basic.6y -14, university degree +12), and its ratio worsened from 0.327 to 0.270.
+- Marital status: 2 groups beyond the gap before, 0 after. Education was not mitigated: 3 groups beyond the gap before (basic.6y -24 points, basic.9y -27, "unknown" +10) and 3 after (basic.6y -14, basic.9y -31, university degree +12), and its ratio worsened from 0.327 to 0.270.
 - Not assessed: gender (no column). Marital "unknown" (12 rows) and education "illiterate" were too small to judge.
 - Alternative tested: refitting without age, marital status and education cost 0.5 points of capture (66.7%) and reduced the age-band breaches from 5 to 2, because other features still stand in for age.
 
