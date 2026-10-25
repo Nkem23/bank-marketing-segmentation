@@ -1,0 +1,28 @@
+
+=== just_below_cutoff: score 0.077 vs cutoff 0.077 ===
+{'age': 41, 'job': 'housemaid', 'marital': 'married', 'education': 'university.degree', 'contact': 'cellular', 'month': 'aug', 'day_of_week': 'thu', 'poutcome': 'nonexistent', 'previous': 0}
+Counterfactuals (changed levers only):
+ contact month day_of_week
+cellular   jul         mon
+cellular   mar         thu
+cellular   may         thu
+
+=== mid_below: score 0.095 vs cutoff 0.100 ===
+{'age': 30, 'job': 'admin.', 'marital': 'single', 'education': 'high.school', 'contact': 'cellular', 'month': 'may', 'day_of_week': 'thu', 'poutcome': 'nonexistent', 'previous': 0}
+Counterfactuals (changed levers only):
+ contact month day_of_week
+cellular   jun         thu
+cellular   jun         tue
+cellular   jun         mon
+
+=== far_below: score 0.047 vs cutoff 0.077 ===
+{'age': 36, 'job': 'entrepreneur', 'marital': 'married', 'education': 'university.degree', 'contact': 'telephone', 'month': 'jun', 'day_of_week': 'tue', 'poutcome': 'nonexistent', 'previous': 0}
+Counterfactuals (changed levers only):
+  contact month day_of_week
+telephone   mar         fri
+ cellular   jun         mon
+telephone   oct         wed
+
+Non-selected customers in test set: 5803
+Could reach the list by changing channel/month/weekday (any): 100.0%
+Could reach the list by changing channel/weekday only (same month): 37.5%

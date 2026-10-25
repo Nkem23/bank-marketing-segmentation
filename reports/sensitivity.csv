@@ -1,0 +1,6 @@
+test,roc_auc,capture30,capture_change_pts
+baseline (deployable model),0.7772,0.6724,0.0
+"age noise, 0.1 SD (mean of 20 draws)",0.7765,0.6725,0.0054
+"age noise, 0.5 SD (mean of 20 draws)",0.7692,0.6558,-1.6649
+'unknown' replaced by most common category,0.7718,0.6649,-0.7543
+"refit without age, marital, education",0.7753,0.667,-0.5388
