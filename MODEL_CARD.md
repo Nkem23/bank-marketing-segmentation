@@ -37,7 +37,7 @@ Rank customer records so that a fixed number of outreach slots goes to those mos
 | Gradient Boosting with economic indicators (upper bound only) | 73.5% (71.1-76.4) | 0.810 |
 
 - The 70% capture target from Modules 1 and 2 was **not met** by the model that could be deployed. The 73.5% result depends on economic indicators that mostly identify the campaign period, so it is an upper bound.
-- Gradient Boosting and Logistic Regression are not statistically different (difference +1.0 point, 95% CI -0.2 to +2.4).
+- Gradient Boosting and Logistic Regression were not statistically different in their full-feature versions (difference +1.0 point, 95% CI -0.2 to +2.4); without economic indicators the gap is 2.2 points with overlapping intervals, and no paired interval was computed.
 - Accuracy is not reported as a headline: the majority class alone scores 88.7%.
 
 ## 6. Fairness analysis
