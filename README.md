@@ -1,47 +1,83 @@
-# Bank Marketing Segmentation
+# Bank Marketing Segmentation: Data Pipeline
 
-Customer segmentation and ethical AI for term-deposit outreach. BAN6800 capstone project, Nexford University.
+Project: Customer Segmentation and Ethical AI for Term-Deposit Outreach (BAN6800, Nexford University).
 
-## Project summary
+A reproducible data pipeline that prepares the UCI Bank Marketing data for customer segmentation and term-deposit outreach scoring. It loads, cleans, checks, anonymises and audits the data, and writes the tables the later modelling modules use.
 
-A prototype that segments bank customers, estimates each customer's probability of subscribing to a term deposit, and allocates a limited number of outreach slots from a ranked list. It is designed to be fair, explainable and capacity-aware, and to support relationship-manager decisions, not replace them.
+## What the pipeline does
 
-Baseline from the dataset: 22.79 campaign contacts per subscriber (105,754 contacts, 4,640 subscribers, 41,188 records).
+Orchestrated by Prefect (`src/pipeline.py`), in this order:
 
-## Status
+1. **Load**: reads the semicolon-separated CSV and checks the schema and row count (`src/preprocessing.py`).
+2. **Transform**: splits `pdays` into `previously_contacted` (from `previous`) and `days_since_previous_contact`.
+3. **Clean**: removes exact duplicate rows.
+4. **Privacy**: scans for direct identifiers and measures re-identification risk with k-anonymity (`src/anonymization.py`).
+5. **Validate**: runs 37 Great Expectations checks (`src/validation.py`). The flow stops if validation fails.
+6. **Bias**: writes a representation report by age band, marital status and education using Fairlearn (`src/bias.py`).
+7. **Output**: writes the cleaned table and a model-inputs table without `duration` and `campaign`.
 
-- Module 1: vision document (complete)
-- Module 2: project plan, architecture, RAID log, data dictionary, repository and board (in reports/)
-- Modules 3 to 5 and the final project: data pipeline, modelling, fairness, dashboard and integration (planned; see the project board)
-
-## Repository structure
-
-    data/          raw and processed data (not committed; see data/README.md)
-    notebooks/     01_data_quality, 02_segmentation, 03_prediction, 04_fairness_evaluation
-    src/           preprocessing.py, segmentation.py, model_training.py, evaluation.py
-    dashboard/     app.py (Streamlit)
-    tests/         unit tests
-    reports/       architecture and fishbone diagrams, RAID log, data dictionary, board screenshot
-    DATA_GOVERNANCE.md, ETHICAL_AI_CHARTER.md, requirements.txt
+Every step writes an entry to `logs/audit.log` (`src/audit.py`): user, UTC time, step, rows in and out, file path and SHA-256 checksum. Data values are never logged.
 
 ## Setup
 
-    git clone https://github.com/Nkem23/bank-marketing-segmentation.git
-    cd bank-marketing-segmentation
-    python -m venv .venv
-    source .venv/Scripts/activate
-    pip install -r requirements.txt
+Download `bank-additional.zip` from the [UCI Bank Marketing dataset](https://archive.ics.uci.edu/dataset/222/bank%2Bmarketing) (CC BY 4.0) and place `bank-additional-full.csv` in `data/raw/`. Raw and processed data are not committed to this repository.
 
-On Mac or Linux, activate with source .venv/bin/activate. The pinned versions were tested with Python 3.11.9. Then obtain the data as described in data/README.md.
+```
+python -m venv .venv
+source .venv/Scripts/activate      # Windows Git Bash; use .venv/bin/activate on macOS or Linux
+pip install -r requirements.txt
+```
 
-## Governance, ethics and fairness
+## Run
 
-See DATA_GOVERNANCE.md and ETHICAL_AI_CHARTER.md. Fairness is evaluated by age band, marital status and education. Gender cannot be assessed because the dataset has no gender column.
+```
+python -m pytest tests -q          # unit tests
+python -m src.pipeline             # run the pipeline
+```
+
+Outputs:
+
+- `data/processed/bank_marketing_clean.csv`: full cleaned table, kept for retrospective evaluation
+- `data/processed/bank_marketing_model_inputs.csv`: table for model training, without `duration` and `campaign`
+- `reports/bias_representation.csv`: group sizes and subscription rates
+- `logs/audit.log`: audit log
+- `gx_project/`: Great Expectations Data Docs (open `gx_project/gx/uncommitted/data_docs/local_site/index.html`)
+
+## Run in Docker
+
+```
+docker build -t bank-marketing-pipeline .
+docker run --rm bank-marketing-pipeline python -m pytest tests -q
+MSYS_NO_PATHCONV=1 docker run --rm -v "$(pwd -W)/data:/app/data" -v "$(pwd -W)/logs:/app/logs" bank-marketing-pipeline
+```
+
+On macOS or Linux, use `-v "$(pwd)/data:/app/data"` and `-v "$(pwd)/logs:/app/logs"` and omit `MSYS_NO_PATHCONV=1`. The data is mounted at run time and is never copied into the image. The cleaned output has the same checksum on a Windows PC and inside the container.
+
+## Repository layout
+
+```
+src/            pipeline code (preprocessing, validation, audit, bias, anonymization, pipeline)
+tests/          pytest unit tests
+reports/        bias report and data dictionary
+Dockerfile      container definition
+requirements.txt, requirements-pipeline.txt   pinned dependencies
+DATA_GOVERNANCE.md, ETHICAL_AI_CHARTER.md     governance and ethics documents
+```
+
+## Key findings
+
+- 12 exact duplicate rows removed (41,188 to 41,176 rows).
+- 4,110 rows have `pdays` = 999 but a recorded earlier contact, so `previously_contacted` is built from `previous`.
+- 789 rows (1.92%) sit in groups smaller than 5 on age band, job, marital status and education.
+- Two groups have fewer than 100 rows: `education = illiterate` and `marital = unknown`.
 
 ## Limitations
 
-The data covers one Portuguese bank's retail telemarketing campaigns from 2008 to 2010. Results may not transfer to Nigerian banking, and the analysis is observational, so findings are hypotheses to test, not proven causes.
+- The data covers one Portuguese bank's retail telemarketing campaigns from 2008 to 2010. It is not validated for Nigerian banking.
+- The bias report checks group sizes and rates, not model fairness. Model fairness is evaluated in Module 4.
+- There is no gender field, so gender cannot be assessed.
+- Role-based access control and the retention policy are designs for deployment, not implemented in this prototype.
 
-## Data source and licence
+## AI disclosure
 
-Moro, S., Rita, P., and Cortez, P. (2012). Bank Marketing [Data set]. UCI Machine Learning Repository. https://archive.ics.uci.edu/dataset/222/bank%2Bmarketing. Licensed under CC BY 4.0.
+This pipeline was built with substantial help from Claude (Anthropic). The code was generated and reviewed in collaboration, and every output was run and checked by the author. See the module's AI Disclosure Form for details.
