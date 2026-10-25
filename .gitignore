@@ -225,3 +225,8 @@ data/processed/*
 
 gx_project/
 logs/
+.venv-m4/
+mlflow.db
+mlruns/
+m4/outputs/
+__pycache__/
