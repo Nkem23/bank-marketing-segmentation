@@ -1,4 +1,4 @@
-# Bank Marketing Segmentation: Data Pipeline
+# Bank Marketing Segmentation: Data Pipeline and Predictive Model
 
 Project: Customer Segmentation and Ethical AI for Term-Deposit Outreach (BAN6800, Nexford University).
 
@@ -80,4 +80,63 @@ DATA_GOVERNANCE.md, ETHICAL_AI_CHARTER.md     governance and ethics documents
 
 ## AI disclosure
 
-This pipeline was built with substantial help from Claude (Anthropic). The code was generated and reviewed in collaboration, and every output was run and checked by the author. See the module's AI Disclosure Form for details.
+The pipeline (Module 3) and the modelling, explainability, fairness and API code (Module 4) were built with substantial help from Claude (Anthropic). The code was generated and reviewed in collaboration, and every output was run and checked by the author. See each module's AI Disclosure Form for details.
+
+
+## Module 4: predictive model, explainability and fairness
+
+Goal: rank customer records by their likelihood of subscribing to a term deposit, so that a fixed outreach budget (the top 30% of the ranked list) goes to the most promising customers, and check that the ranking is explainable and treats age, marital status and education groups fairly.
+
+### Headline results (stratified hold-out test set, 8,236 records, 928 subscribers)
+
+| Configuration | Capture in top 30% | ROC-AUC |
+|---|---|---|
+| Random selection | 29.9% | 0.50 |
+| RM-style rule (previous-campaign outcome) | 46.1% | 0.623 |
+| Gradient Boosting without economic indicators (proposed scorer) | 67.2% | 0.777 |
+| Same model with age-band cutoffs (fairness mitigation) | 62.4% | n/a |
+| Gradient Boosting with economic indicators (upper bound only) | 73.5% | 0.810 |
+
+- The 70% capture target from Modules 1 and 2 was **not met**. The 73.5% model depends on economic indicators that mostly identify the campaign period, so it is not used.
+- Age-band cutoffs reduced the age bands beyond the 10-point recall gap from 5 to 0, at a cost of 4.8 points of capture. Education gaps were not mitigated (3 groups beyond the gap before and after).
+- Refitting without age, marital status and education cost 0.5 points of capture and reduced the breaches from 5 to 2. This is the option recommended in the Model Card, for review by an ethics committee.
+- Under a time-ordered split, subscription rates rose from 6.4% in training to 30.8% in testing and performance fell (AUC 0.65 to 0.70), so drift monitoring is essential.
+
+### Where to find each deliverable
+
+| Deliverable | Location |
+|---|---|
+| Model Card | `MODEL_CARD.md` |
+| Fairness Metrics Report | `reports/FAIRNESS_REPORT.md` (tables in `reports/fairness_metrics.csv` and `reports/fairness_mitigation.csv`) |
+| SHAP analysis notebook | `notebooks/05_shap_analysis.ipynb` |
+| Figures (ROC, gain, confusion matrix, SHAP, API, MLflow) | `reports/figures/` |
+| MLflow run log (25 runs with timestamps) | `reports/mlflow_run_log.csv`; screenshots `fig9` to `fig11` |
+| Serialized models | `models/*.joblib`; registered in MLflow as `term_deposit_ranker` v1 (alias `production`) |
+| FastAPI app with `/predict` | `app/main.py`; tests in `tests/test_predict_api.py` |
+| Modelling scripts | `m4/` (run in numeric order) |
+
+### Reproduce
+
+Needs `data/processed/bank_marketing_clean.csv` from the Module 3 pipeline. Tested on Windows with Python 3.11.
+
+```
+python -m venv .venv-m4
+source .venv-m4/Scripts/activate
+pip install -r requirements-model.txt
+python m4/00_declare_targets.py      # logs the targets before any model is trained
+# then run the other scripts in m4/ in numeric order
+mlflow ui --backend-store-uri sqlite:///mlflow.db
+uvicorn app.main:app --port 8000     # API docs at http://127.0.0.1:8000/docs
+python tests/test_predict_api.py     # API tests
+```
+
+The MLflow database (`mlflow.db`) and row-level scores (`m4/outputs/`) are not committed because they hold record-level data. Running the scripts recreates them.
+
+### Limitations
+
+- One Portuguese bank, retail telemarketing, 2008 to 2010. Not validated for Nigerian banking or for corporate relationship banking.
+- The data has no customer identifier and no gender field.
+- Fairness estimates for small groups are imprecise (50 to 346 subscribers per age band in the test set).
+- The API has no authentication, applies a per-customer cutoff and loads a pickled model, so it is a demonstration and not a production service.
+- Using age to set cutoffs is a protected attribute used at decision time and needs compliance review.
+
