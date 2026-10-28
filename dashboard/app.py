@@ -138,11 +138,6 @@ with tab_overview:
     c3.metric("Contacts per subscriber vs random", "Not established",
               "7.83 vs 23.00 was for the full-feature model only", delta_color="off")
 
-    gain = FIG_DIR / "fig2_gain.png"
-    if gain.exists():
-        st.subheader("Cumulative gain curve (Module 4, Figure 1)")
-        st.image(str(gain))
-
     shap_img = FIG_DIR / "fig6_shap_summary_deployable.png"
     if shap_img.exists():
         st.subheader("What drives the scores")
@@ -150,6 +145,12 @@ with tab_overview:
                  "and the months June and April. These show association, not cause, and may "
                  "reflect how the campaigns were run.")
         st.image(str(shap_img))
+        st.caption("How to read this: each dot is one customer record. Dots to the right raise "
+                   "the score and dots to the left lower it. Red means the feature is present "
+                   "or high, blue means absent or low. 'missingindicator_days_since_previous_"
+                   "contact' means no earlier contact is recorded: records that do have an "
+                   "earlier contact (blue) are pushed up strongly. Month labels show the month "
+                   "of contact.")
 
 # ---------------------------------------------------------------- score + what-if
 with tab_score:
