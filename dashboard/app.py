@@ -131,12 +131,12 @@ with tab_overview:
 
     st.subheader("Progress against the three Module 1 goals")
     c1, c2, c3 = st.columns(3)
-    c1.metric("Subscribers reached in top 30%", "67.2%",
-              "Target 70%: not confidently met (CI 64.7-70.0)", delta_color="off")
-    c2.metric("Age-band recall gaps within 10 points", "0 of 6 bands beyond",
-              "Only with age-band cutoffs, which lower capture to 62.4%", delta_color="off")
-    c3.metric("Contacts per subscriber vs random", "Not established",
-              "7.83 vs 23.00 was for the full-feature model only", delta_color="off")
+    c1.metric("Subscribers reached in top 30%", "67.2%")
+    c1.caption("Target 70%: not confidently met (CI 64.7-70.0)")
+    c2.metric("Age-band recall gaps within 10 points", "0 of 6 bands beyond")
+    c2.caption("Only with age-band cutoffs, which lower capture to 62.4%")
+    c3.metric("Contacts per subscriber vs random", "Not established")
+    c3.caption("7.83 vs 23.00 was for the full-feature model only")
 
     shap_img = FIG_DIR / "fig6_shap_summary_deployable.png"
     if shap_img.exists():
@@ -288,10 +288,10 @@ with tab_fair:
     st.subheader("Other fairness measures")
     f1, f2, f3 = st.columns(3)
     f1.metric("Disparate impact ratio (age), before", "0.161")
-    f2.metric("Disparate impact ratio (age), after", "0.371", "Screening convention: 0.80",
-              delta_color="off")
-    f3.metric("Education groups beyond the rule", "3 before, 3 after",
-              "Education was not mitigated", delta_color="off")
+    f2.metric("Disparate impact ratio (age), after", "0.371")
+    f2.caption("Screening convention: 0.80")
+    f3.metric("Education groups beyond the rule", "3 before, 3 after")
+    f3.caption("Education was not mitigated")
     st.write("The ratio stays below 0.80 because subscription rates differ widely by age (about "
              "7% to 52%) and the project targeted equal recall, not equal selection. The two "
              "measures cannot both be met with this approach. For education, the widest gap after "
