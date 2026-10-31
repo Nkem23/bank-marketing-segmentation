@@ -2,7 +2,7 @@
 
 Project: Customer Segmentation and Ethical AI for Term-Deposit Outreach (BAN6800, Nexford University).
 
-A reproducible data pipeline that prepares the UCI Bank Marketing data for customer segmentation and term-deposit outreach scoring. It loads, cleans, checks, anonymises and audits the data, and writes the tables the later modelling modules use.
+A reproducible analytics project on the UCI Bank Marketing data for term-deposit outreach: a data pipeline (Module 3), a ranking model with explainability, fairness checks and an API (Module 4), a stakeholder dashboard (Module 5), and CI, containers and monitoring added for the final project. Customer segmentation was planned in Module 1 but was not built; the final system ranks customers with one model plus age-band cutoffs. The pipeline loads, cleans, checks, anonymises and audits the data, and writes the tables the later modelling modules use.
 
 ## Final project: live system and quick links
 
@@ -88,12 +88,20 @@ On macOS or Linux, use `-v "$(pwd)/data:/app/data"` and `-v "$(pwd)/logs:/app/lo
 ## Repository layout
 
 ```
-src/            pipeline code (preprocessing, validation, audit, bias, anonymization, pipeline)
-tests/          pytest unit tests
-reports/        bias report and data dictionary
-Dockerfile      container definition
-requirements.txt, requirements-pipeline.txt   pinned dependencies
-DATA_GOVERNANCE.md, ETHICAL_AI_CHARTER.md     governance and ethics documents
+src/            pipeline code (preprocessing, validation, audit, bias, anonymization, pipeline) and monitoring.py
+app/            FastAPI scoring service (/health, /predict)
+m4/             Module 4 modelling scripts, run in numeric order
+notebooks/      analysis notebooks (SHAP analysis in 05_shap_analysis.ipynb)
+dashboard/      Streamlit dashboard (app.py) and the Monitoring tab (monitoring_tab.py)
+models/         trained models (.joblib) and age_band_cutoffs.json
+tests/          pytest tests (23)
+reports/        bias report, data dictionary, figures, fairness metrics, monitoring_summary.json
+.github/workflows/ci.yml   GitHub Actions: installs dependencies and runs the tests
+Dockerfile      pipeline container
+Dockerfile.api  API container
+docker-compose.yml   starts the API container
+requirements*.txt    pinned dependencies (pipeline, model, API, all)
+MODEL_CARD.md, DATA_GOVERNANCE.md, ETHICAL_AI_CHARTER.md   documentation
 ```
 
 ## Key findings
@@ -112,8 +120,7 @@ DATA_GOVERNANCE.md, ETHICAL_AI_CHARTER.md     governance and ethics documents
 
 ## AI disclosure
 
-The pipeline (Module 3) and the modelling, explainability, fairness and API code (Module 4) were built with substantial help from Claude (Anthropic). The code was generated and reviewed in collaboration, and every output was run and checked by the author. See each module's AI Disclosure Form for details.
-
+The pipeline (Module 3) and the modelling, explainability, fairness and API code (Module 4) were built with substantial help from Claude (Anthropic). The final-project additions (the CI workflow, the API Dockerfile and docker-compose file, the monitoring script and dashboard Monitoring tab, the README additions and the integrated report) were also drafted with Claude, then run, tested and checked by the author. The code was generated and reviewed in collaboration, and every output was run and checked by the author. See each module's AI Disclosure Form, and the final project's form, for details.
 
 ## Module 4: predictive model, explainability and fairness
 
