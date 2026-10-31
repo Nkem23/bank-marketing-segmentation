@@ -4,6 +4,38 @@ Project: Customer Segmentation and Ethical AI for Term-Deposit Outreach (BAN6800
 
 A reproducible data pipeline that prepares the UCI Bank Marketing data for customer segmentation and term-deposit outreach scoring. It loads, cleans, checks, anonymises and audits the data, and writes the tables the later modelling modules use.
 
+## Final project: live system and quick links
+
+This repository holds the full BAN6800 analytics project: the data pipeline (Module 3), the model, explainability and fairness work (Module 4), the stakeholder dashboard (Module 5), and the monitoring, CI and container setup added for the final project.
+
+| Component | Where |
+|---|---|
+| Live dashboard (results, what-if scoring, fairness, limitations, Monitoring tab) | https://bank-marketing-segmentation-xmqjcsbytc8lkcrabwkzaz.streamlit.app/ |
+| Live API (demonstration only): `/health`, `/predict`, `/docs` | https://term-deposit-ranking-api.onrender.com/docs |
+| Monitoring dashboard | Monitoring tab of the live dashboard; script `src/monitoring.py`; output `reports/monitoring_summary.json` |
+| CI (GitHub Actions) | `.github/workflows/ci.yml` runs the 23 tests on every push |
+| Docker Compose | `docker-compose.yml` (API container built from `Dockerfile.api`) |
+| Model card | `MODEL_CARD.md` |
+
+The API runs on a free hosting plan that sleeps when idle, so the first request can take about a minute.
+
+### Run the final-project components
+
+```
+docker compose up -d --build api                 # API at http://localhost:8000/docs
+python api_demo.py --url http://127.0.0.1:8000   # sends example customers to the API
+python -m src.monitoring                         # rebuilds reports/monitoring_summary.json
+streamlit run dashboard/app.py                   # dashboard at http://localhost:8501
+```
+
+### Status and limits
+
+- Monitoring is a baseline built and run on the Module 4 hold-out data, with alert rules for drift (subscription rate shift above 5 points) and age-band recall gaps (above 10 points). No live outcome data exists, so this is not production monitoring.
+- Automated retraining is designed but not built.
+- The API has no authentication and loads a pickled model. It is a public demonstration endpoint and is not fit for real customer data.
+- The live API and dashboard serve the age-band cutoff configuration. The Model Card recommends the refit without age, marital status and education for ethics committee review (see the Module 4 section below).
+
+
 ## What the pipeline does
 
 Orchestrated by Prefect (`src/pipeline.py`), in this order:
