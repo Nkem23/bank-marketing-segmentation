@@ -1,0 +1,204 @@
+{
+  "generated_utc": "2026-10-31T05:20:29+00:00",
+  "model": "term_deposit_ranker v1 (no economic indicators) with age-band cutoffs",
+  "rules": {
+    "base_rate_shift_alert_pts": 5.0,
+    "recall_gap_alert_pts": 10.0,
+    "min_subscribers_per_band": 30
+  },
+  "drift": {
+    "rows_earlier": 32940,
+    "rows_later": 8236,
+    "base_rate_earlier_pct": 6.38,
+    "base_rate_later_pct": 30.83,
+    "shift_pts": 24.45,
+    "alert": true,
+    "mix": [
+      {
+        "feature": "contact",
+        "category": "cellular",
+        "earlier_pct": 57.35,
+        "later_pct": 87.96,
+        "change_pts": 30.61
+      },
+      {
+        "feature": "contact",
+        "category": "telephone",
+        "earlier_pct": 42.65,
+        "later_pct": 12.04,
+        "change_pts": -30.61
+      },
+      {
+        "feature": "poutcome",
+        "category": "failure",
+        "earlier_pct": 6.4,
+        "later_pct": 26.04,
+        "change_pts": 19.65
+      },
+      {
+        "feature": "poutcome",
+        "category": "nonexistent",
+        "earlier_pct": 93.09,
+        "later_pct": 59.32,
+        "change_pts": -33.77
+      },
+      {
+        "feature": "poutcome",
+        "category": "success",
+        "earlier_pct": 0.51,
+        "later_pct": 14.63,
+        "change_pts": 14.12
+      },
+      {
+        "feature": "month",
+        "category": "apr",
+        "earlier_pct": 7.46,
+        "later_pct": 2.11,
+        "change_pts": -5.35
+      },
+      {
+        "feature": "month",
+        "category": "aug",
+        "earlier_pct": 15.7,
+        "later_pct": 12.18,
+        "change_pts": -3.53
+      },
+      {
+        "feature": "month",
+        "category": "dec",
+        "earlier_pct": 0.03,
+        "later_pct": 2.09,
+        "change_pts": 2.06
+      },
+      {
+        "feature": "month",
+        "category": "jul",
+        "earlier_pct": 20.28,
+        "later_pct": 5.93,
+        "change_pts": -14.36
+      },
+      {
+        "feature": "month",
+        "category": "jun",
+        "earlier_pct": 13.28,
+        "later_pct": 11.46,
+        "change_pts": -1.82
+      },
+      {
+        "feature": "month",
+        "category": "mar",
+        "earlier_pct": 0.86,
+        "later_pct": 3.21,
+        "change_pts": 2.35
+      },
+      {
+        "feature": "month",
+        "category": "may",
+        "earlier_pct": 31.21,
+        "later_pct": 42.33,
+        "change_pts": 11.12
+      },
+      {
+        "feature": "month",
+        "category": "nov",
+        "earlier_pct": 10.97,
+        "later_pct": 5.89,
+        "change_pts": -5.09
+      },
+      {
+        "feature": "month",
+        "category": "oct",
+        "earlier_pct": 0.2,
+        "later_pct": 7.89,
+        "change_pts": 7.69
+      },
+      {
+        "feature": "month",
+        "category": "sep",
+        "earlier_pct": 0.0,
+        "later_pct": 6.92,
+        "change_pts": 6.92
+      }
+    ]
+  },
+  "fairness": {
+    "test_records": 8236,
+    "test_subscribers": 928,
+    "overall_recall_pct": 62.4,
+    "overall_selection_rate_pct": 29.5,
+    "age_bands": [
+      {
+        "age_band": "17-24",
+        "records": 214,
+        "subscribers": 50,
+        "recall_pct": 56.0,
+        "ci_low_pct": 42.3,
+        "ci_high_pct": 68.8,
+        "selection_rate_pct": 29.0,
+        "gap_pts": -6.4,
+        "enough_subscribers": true,
+        "alert": false
+      },
+      {
+        "age_band": "25-34",
+        "records": 2720,
+        "subscribers": 346,
+        "recall_pct": 62.1,
+        "ci_low_pct": 56.9,
+        "ci_high_pct": 67.1,
+        "selection_rate_pct": 27.1,
+        "gap_pts": -0.3,
+        "enough_subscribers": true,
+        "alert": false
+      },
+      {
+        "age_band": "35-44",
+        "records": 2734,
+        "subscribers": 252,
+        "recall_pct": 61.9,
+        "ci_low_pct": 55.8,
+        "ci_high_pct": 67.7,
+        "selection_rate_pct": 32.7,
+        "gap_pts": -0.5,
+        "enough_subscribers": true,
+        "alert": false
+      },
+      {
+        "age_band": "45-54",
+        "records": 1727,
+        "subscribers": 129,
+        "recall_pct": 66.7,
+        "ci_low_pct": 58.2,
+        "ci_high_pct": 74.2,
+        "selection_rate_pct": 30.7,
+        "gap_pts": 4.3,
+        "enough_subscribers": true,
+        "alert": false
+      },
+      {
+        "age_band": "55-64",
+        "records": 721,
+        "subscribers": 89,
+        "recall_pct": 59.6,
+        "ci_low_pct": 49.2,
+        "ci_high_pct": 69.1,
+        "selection_rate_pct": 20.1,
+        "gap_pts": -2.8,
+        "enough_subscribers": true,
+        "alert": false
+      },
+      {
+        "age_band": "65+",
+        "records": 120,
+        "subscribers": 62,
+        "recall_pct": 66.1,
+        "ci_low_pct": 53.7,
+        "ci_high_pct": 76.7,
+        "selection_rate_pct": 54.2,
+        "gap_pts": 3.7,
+        "enough_subscribers": true,
+        "alert": false
+      }
+    ]
+  }
+}

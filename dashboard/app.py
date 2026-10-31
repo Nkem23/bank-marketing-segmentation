@@ -14,6 +14,8 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
+from monitoring_tab import render_monitoring
+
 ROOT = Path(__file__).resolve().parent.parent
 MODEL_PATH = ROOT / "models" / "stratified_no_macro_gboost.joblib"
 CUTOFF_PATH = ROOT / "models" / "age_band_cutoffs.json"
@@ -90,9 +92,9 @@ st.caption("BAN6800 Module 5 | Academic prototype built on Portuguese retail tel
            "(2008-2010). Not deployed. Decision support only: a relationship manager makes every "
            "decision. Inputs on this page are illustrative; no real customer data is used.")
 
-tab_overview, tab_score, tab_fair, tab_limits = st.tabs(
+tab_overview, tab_score, tab_fair, tab_limits, tab_monitor = st.tabs(
     ["Results overview", "Score a customer and what-if", "Ethical compliance: fairness",
-     "Limitations and transparency"])
+     "Limitations and transparency", "Monitoring"])
 
 # ---------------------------------------------------------------- overview
 with tab_overview:
@@ -344,3 +346,6 @@ with tab_limits:
     st.caption("Sources: Module 4 Predictive Model Development and Validation Report and Model "
                "Card (25 October 2026); Moro et al. (2012) data set. Repository: "
                "github.com/Nkem23/bank-marketing-segmentation")
+
+with tab_monitor:
+    render_monitoring(ROOT, BLUE, ORANGE, GREY, LIGHT)
